@@ -1,0 +1,3 @@
+<!-- Use this file to provide workspace-specific custom instructions to Copilot. For more details, visit https://code.visualstudio.com/docs/copilot/copilot-customization#_use-a-githubcopilotinstructionsmd-file -->
+
+This is a monorepo for a web-based blog writing tool. The frontend is a React+Vite+TypeScript app (client), and the backend is a Node.js+Express+TypeScript app (server). Follow best practices for full-stack TypeScript development. Use TipTap for the rich text editor. Implement REST APIs for file import/export, social/blogging platform integrations, and OAuth. Prioritize modularity and maintainability.
