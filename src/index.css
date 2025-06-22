@@ -136,7 +136,7 @@ button:focus-visible {
 
 input[type="file"], input[type="text"] {
   background: var(--color-secondary-light-gray);
-  border: 1px solid var(--color-primary-dark-gray);
+  border: 0px solid var(--color-primary-dark-gray);
   border-radius: 6px;
   padding: 0.5em 1em;
   font-family: var(--font-primary);

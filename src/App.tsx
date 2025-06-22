@@ -22,7 +22,7 @@ import Box from '@mui/material/Box';
 function App() {
   const editor = useEditor({
     extensions: [StarterKit],
-    content: '<h2>Start writing your blog post here...</h2>',
+    content: '<h1>Start writing your blog post here...</h1>', // Set initial content as H1
   });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
