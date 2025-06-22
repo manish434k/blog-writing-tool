@@ -61,15 +61,28 @@ const SideBar: React.FC<SideBarProps> = React.memo(function SideBarMemo({
   const showClose = variant !== 'permanent';
   // Responsive width
   const width = typeof window !== 'undefined' && window.innerWidth < 600 ? 180 : 240;
+  // Height of the header (AppBar) to offset the sidebar content
+  const headerHeight = typeof window !== 'undefined' && window.innerWidth < 600 ? 56 : 64;
   return (
     <Drawer
       variant={variant}
       anchor="left"
       open={open}
       onClose={onClose}
-      PaperProps={{ sx: { width, bgcolor: 'background.default', borderRight: 1, borderColor: 'divider', display: 'flex', flexDirection: 'column', height: '100%' } }}
+      PaperProps={{
+        sx: {
+          width,
+          bgcolor: 'background.default',
+          borderRight: 1,
+          borderColor: 'divider',
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
+          mt: { xs: `${headerHeight}px`, sm: `${headerHeight}px` }, // offset for header
+        }
+      }}
     >
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', marginTop: 32 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         {showClose && (
           <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: '8px 8px 0 8px' }}>
             <IconButton onClick={onClose} aria-label="Close sidebar" size="small">
