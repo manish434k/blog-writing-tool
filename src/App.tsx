@@ -2,7 +2,7 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import './App.css';
 import axios from 'axios';
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 function MenuBar({ editor }: { editor: any }) {
   if (!editor) {
@@ -51,6 +51,8 @@ function App() {
   });
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [importUrl, setImportUrl] = useState('');
+  const [importing, setImporting] = useState(false);
 
   // Save post to backend
   const savePost = useCallback(async () => {
@@ -103,6 +105,34 @@ function App() {
       alert('Unsupported file type');
     }
     if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  // Import from URL handler
+  const importFromUrl = async () => {
+    if (!importUrl || !editor) return;
+    setImporting(true);
+    try {
+      const res = await axios.post('http://localhost:4000/api/import/url', { url: importUrl });
+      let content = '';
+      if (typeof res.data.content === 'string' && res.data.content.trim().startsWith('<')) {
+        content = res.data.content;
+      } else if (typeof res.data.content === 'string') {
+        content = `<pre>${res.data.content}</pre>`;
+      } else {
+        content = JSON.stringify(res.data.content);
+      }
+      editor.commands.setContent(content);
+    } catch (err: any) {
+      let msg = 'Failed to import from URL';
+      if (err.response && err.response.data && err.response.data.error) {
+        msg += `: ${err.response.data.error}`;
+      } else if (err.message) {
+        msg += `: ${err.message}`;
+      }
+      alert(msg);
+    } finally {
+      setImporting(false);
+    }
   };
 
   // Export as .txt
@@ -183,6 +213,18 @@ function App() {
         <button onClick={exportAsHtml}>Export as .html</button>
         <button onClick={exportAsDocx}>Export as .docx</button>
         <button onClick={exportAsPdf}>Export as .pdf</button>
+      </div>
+      <div style={{ marginBottom: 16, display: 'flex', gap: 8, alignItems: 'center' }}>
+        <input
+          type="text"
+          placeholder="Import from URL (http(s)://...)"
+          value={importUrl}
+          onChange={e => setImportUrl(e.target.value)}
+          style={{ width: 320 }}
+        />
+        <button onClick={importFromUrl} disabled={importing || !importUrl}>
+          {importing ? 'Importing...' : 'Import from URL'}
+        </button>
       </div>
       <EditorContent editor={editor} />
     </div>

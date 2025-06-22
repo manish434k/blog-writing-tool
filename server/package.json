@@ -20,8 +20,10 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@types/cors": "^2.8.19",
     "@types/node": "^24.0.3",
     "axios": "^1.10.0",
+    "cors": "^2.8.5",
     "docx": "^9.5.1",
     "express": "^4.21.2",
     "mammoth": "^1.7.0",

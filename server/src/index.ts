@@ -6,11 +6,14 @@ import fs from 'fs';
 import path from 'path';
 import htmlDocx from 'html-docx-js';
 import puppeteer from 'puppeteer';
+import axios from 'axios';
+import cors from 'cors';
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 
 app.use(express.json());
+app.use(cors({ origin: 'http://localhost:5173' }));
 
 // Middleware for logging all requests
 app.use((req, res, next) => {
@@ -72,6 +75,32 @@ app.post('/api/import/pdf', upload.single('file'), async (req, res) => {
     res.json({ content: data.text });
   } catch (err) {
     res.status(500).json({ error: 'Failed to parse .pdf' });
+  }
+});
+
+// Import from URL (proxy to avoid CORS)
+app.post('/api/import/url', express.json(), async (req, res) => {
+  const { url } = req.body;
+  if (!url || typeof url !== 'string') {
+    return res.status(400).json({ error: 'No URL provided' });
+  }
+  try {
+    const response = await axios.get(url, {
+      responseType: 'text',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      }
+    });
+    res.json({ content: response.data });
+  } catch (err) {
+    console.error(`[Import URL Error]`, err);
+    let message = 'Failed to fetch URL';
+    if (axios.isAxiosError(err) && err.response) {
+      message += `: ${err.response.status} ${err.response.statusText}`;
+    } else if (err instanceof Error) {
+      message += `: ${err.message}`;
+    }
+    res.status(500).json({ error: message });
   }
 });
 
