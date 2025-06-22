@@ -8,15 +8,14 @@ import { ThemeProvider, CssBaseline } from '@mui/material';
 import muiTheme from './muiTheme';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
-import MenuIcon from '@mui/icons-material/Menu';
+import debounce from 'lodash.debounce';
+import Header from './components/Header';
 import MenuBar from './components/MenuBar';
 import SideBar from './components/SideBar';
-import debounce from 'lodash.debounce';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
 
 // --- COMPONENTS ---
 
@@ -187,32 +186,20 @@ function App() {
     }
   };
 
+  // Handler for sidebar toggle
+  const handleMenuClick = () => {
+    if (isMobile) setSidebarOpen(true);
+    else setDesktopSidebarMode(m => (m === 'permanent' ? 'temporary' : 'permanent'));
+  };
+
   return (
     <ThemeProvider theme={muiTheme}>
       <CssBaseline />
       <div className="App">
-        <AppBar position="static" color="primary" enableColorOnDark elevation={0} sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: 'primary.main' }}>
-          <Toolbar>
-            <Button
-              color="primary"
-              onClick={() => {
-                if (isMobile) setSidebarOpen(true);
-                else setDesktopSidebarMode(m => (m === 'permanent' ? 'temporary' : 'permanent'));
-              }}
-              sx={{ mr: 2, minWidth: 0, p: 1 }}
-              aria-label="Open menu"
-            >
-              <MenuIcon />
-            </Button>
-            <Typography variant="h4" color="primary" sx={{ flexGrow: 1, fontWeight: 'bold', fontFamily: 'Roboto, Arial, Helvetica, sans-serif' }}>
-              Bloggy
-            </Typography>
-            <Typography variant="subtitle1" color="secondary" sx={{ fontFamily: 'Merriweather, Georgia, serif' }}>
-              Write with Clarity
-            </Typography>
-          </Toolbar>
-        </AppBar>
-        <div className="AppMain">
+        <Box sx={{ position: 'sticky', top: 0, zIndex: 1201, width: '100%' }}>
+          <Header onMenuClick={handleMenuClick} />
+        </Box>
+        <Box sx={{ position: 'relative', zIndex: 1200 }}>
           <SideBar
             onSave={savePost}
             onLoad={loadPost}
@@ -230,6 +217,8 @@ function App() {
             open={isMobile ? sidebarOpen : desktopSidebarMode === 'permanent' ? true : sidebarOpen}
             onClose={() => setSidebarOpen(false)}
           />
+        </Box>
+        <div className="AppMain">
           <Container maxWidth="md" sx={{ py: { xs: 2, sm: 3, md: 4 } }}>
             <div className="AppContent">
               <MenuBar editor={editor} />
