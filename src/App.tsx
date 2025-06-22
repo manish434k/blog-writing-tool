@@ -3,46 +3,22 @@ import StarterKit from '@tiptap/starter-kit';
 import './App.css';
 import axios from 'axios';
 import { useCallback, useRef, useState } from 'react';
+import React from 'react';
+import { ThemeProvider, CssBaseline } from '@mui/material';
+import muiTheme from './muiTheme';
+import Container from '@mui/material/Container';
+import Button from '@mui/material/Button';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
+import MenuIcon from '@mui/icons-material/Menu';
+import MenuBar from './components/MenuBar';
+import SideBar from './components/SideBar';
+import debounce from 'lodash.debounce';
 
-function MenuBar({ editor }: { editor: any }) {
-  if (!editor) {
-    return null;
-  }
-  return (
-    <div className="menu-bar">
-      <button onClick={() => editor.chain().focus().toggleBold().run()} className={editor.isActive('bold') ? 'is-active' : ''}>
-        Bold
-      </button>
-      <button onClick={() => editor.chain().focus().toggleItalic().run()} className={editor.isActive('italic') ? 'is-active' : ''}>
-        Italic
-      </button>
-      <button onClick={() => editor.chain().focus().toggleStrike().run()} className={editor.isActive('strike') ? 'is-active' : ''}>
-        Strike
-      </button>
-      <button onClick={() => editor.chain().focus().setParagraph().run()} className={editor.isActive('paragraph') ? 'is-active' : ''}>
-        Paragraph
-      </button>
-      <button onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} className={editor.isActive('heading', { level: 1 }) ? 'is-active' : ''}>
-        H1
-      </button>
-      <button onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} className={editor.isActive('heading', { level: 2 }) ? 'is-active' : ''}>
-        H2
-      </button>
-      <button onClick={() => editor.chain().focus().toggleBulletList().run()} className={editor.isActive('bulletList') ? 'is-active' : ''}>
-        Bullet List
-      </button>
-      <button onClick={() => editor.chain().focus().toggleOrderedList().run()} className={editor.isActive('orderedList') ? 'is-active' : ''}>
-        Ordered List
-      </button>
-      <button onClick={() => editor.chain().focus().undo().run()}>
-        Undo
-      </button>
-      <button onClick={() => editor.chain().focus().redo().run()}>
-        Redo
-      </button>
-    </div>
-  );
-}
+// --- COMPONENTS ---
 
 function App() {
   const editor = useEditor({
@@ -50,9 +26,18 @@ function App() {
     content: '<h2>Start writing your blog post here...</h2>',
   });
 
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [importUrl, setImportUrl] = useState('');
   const [importing, setImporting] = useState(false);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Add a toggle for desktop sidebar
+  const [desktopSidebarMode, setDesktopSidebarMode] = useState<'permanent' | 'temporary'>('permanent');
+
+  // Debounced URL setter
+  const debouncedSetImportUrl = React.useMemo(() => debounce(setImportUrl, 300), []);
 
   // Save post to backend
   const savePost = useCallback(async () => {
@@ -61,9 +46,9 @@ function App() {
     const id = 'demo-post';
     try {
       await axios.post('http://localhost:4000/api/posts', { id, content });
-      alert('Post saved!');
+      // showSnackbar('Post saved!', 'success');
     } catch (err) {
-      alert('Failed to save post');
+      // showSnackbar('Failed to save post', 'error');
     }
   }, [editor]);
 
@@ -73,9 +58,9 @@ function App() {
     try {
       const res = await axios.get(`http://localhost:4000/api/posts/${id}`);
       if (editor) editor.commands.setContent(res.data.content);
-      alert('Post loaded!');
+      // showSnackbar('Post loaded!', 'success');
     } catch (err) {
-      alert('Failed to load post');
+      // showSnackbar('Failed to load post', 'error');
     }
   }, [editor]);
 
@@ -87,6 +72,7 @@ function App() {
     if (ext === 'txt') {
       const text = await file.text();
       editor.commands.setContent(`<pre>${text}</pre>`);
+      // showSnackbar('Text file imported!', 'success');
     } else if (ext === 'docx' || ext === 'pdf') {
       const formData = new FormData();
       formData.append('file', file);
@@ -98,11 +84,12 @@ function App() {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
         editor.commands.setContent(res.data.content);
+        // showSnackbar(`${ext.toUpperCase()} file imported!`, 'success');
       } catch (err) {
-        alert('Failed to import file');
+        // showSnackbar('Failed to import file', 'error');
       }
     } else {
-      alert('Unsupported file type');
+      // showSnackbar('Unsupported file type', 'warning');
     }
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
@@ -122,6 +109,7 @@ function App() {
         content = JSON.stringify(res.data.content);
       }
       editor.commands.setContent(content);
+      // showSnackbar('Imported from URL!', 'success');
     } catch (err: any) {
       let msg = 'Failed to import from URL';
       if (err.response && err.response.data && err.response.data.error) {
@@ -129,7 +117,7 @@ function App() {
       } else if (err.message) {
         msg += `: ${err.message}`;
       }
-      alert(msg);
+      // showSnackbar(msg, 'error');
     } finally {
       setImporting(false);
     }
@@ -146,9 +134,10 @@ function App() {
     a.download = 'post.txt';
     a.click();
     URL.revokeObjectURL(url);
+    // showSnackbar('Exported as .txt!', 'success');
   };
 
-  // Export as .html (for .docx or .pdf conversion, backend can be used in future)
+  // Export as .html
   const exportAsHtml = () => {
     if (!editor) return;
     const html = editor.getHTML();
@@ -159,6 +148,7 @@ function App() {
     a.download = 'post.html';
     a.click();
     URL.revokeObjectURL(url);
+    // showSnackbar('Exported as .html!', 'success');
   };
 
   // Export as .docx
@@ -173,8 +163,9 @@ function App() {
       a.download = 'post.docx';
       a.click();
       window.URL.revokeObjectURL(url);
+      // showSnackbar('Exported as .docx!', 'success');
     } catch (err) {
-      alert('Failed to export as .docx');
+      // showSnackbar('Failed to export as .docx', 'error');
     }
   };
 
@@ -190,44 +181,83 @@ function App() {
       a.download = 'post.pdf';
       a.click();
       window.URL.revokeObjectURL(url);
+      // showSnackbar('Exported as .pdf!', 'success');
     } catch (err) {
-      alert('Failed to export as .pdf');
+      // showSnackbar('Failed to export as .pdf', 'error');
     }
   };
 
   return (
-    <div className="App">
-      <h1>Blog Writing Tool</h1>
-      <MenuBar editor={editor} />
-      <div style={{ marginBottom: 16, display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-        <button onClick={savePost}>Save Post</button>
-        <button onClick={loadPost}>Load Post</button>
-        <input
-          type="file"
-          accept=".txt,.docx,.pdf"
-          ref={fileInputRef}
-          onChange={handleFileImport}
-          style={{ marginLeft: 8, marginRight: 8 }}
-        />
-        <button onClick={exportAsTxt}>Export as .txt</button>
-        <button onClick={exportAsHtml}>Export as .html</button>
-        <button onClick={exportAsDocx}>Export as .docx</button>
-        <button onClick={exportAsPdf}>Export as .pdf</button>
+    <ThemeProvider theme={muiTheme}>
+      <CssBaseline />
+      <div className="App">
+        <AppBar position="static" color="primary" enableColorOnDark elevation={0} sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: 'primary.main' }}>
+          <Toolbar>
+            <Button
+              color="primary"
+              onClick={() => {
+                if (isMobile) setSidebarOpen(true);
+                else setDesktopSidebarMode(m => (m === 'permanent' ? 'temporary' : 'permanent'));
+              }}
+              sx={{ mr: 2, minWidth: 0, p: 1 }}
+              aria-label="Open menu"
+            >
+              <MenuIcon />
+            </Button>
+            <Typography variant="h4" color="primary" sx={{ flexGrow: 1, fontWeight: 'bold', fontFamily: 'Roboto, Arial, Helvetica, sans-serif' }}>
+              Bloggy
+            </Typography>
+            <Typography variant="subtitle1" color="secondary" sx={{ fontFamily: 'Merriweather, Georgia, serif' }}>
+              Write with Clarity
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <div className="AppMain">
+          <SideBar
+            onSave={savePost}
+            onLoad={loadPost}
+            onImportFile={handleFileImport}
+            onExportTxt={exportAsTxt}
+            onExportHtml={exportAsHtml}
+            onExportDocx={exportAsDocx}
+            onExportPdf={exportAsPdf}
+            onImportUrl={importFromUrl}
+            importUrl={importUrl}
+            setImportUrl={debouncedSetImportUrl}
+            importing={importing}
+            fileInputRef={fileInputRef}
+            variant={isMobile ? 'temporary' : desktopSidebarMode}
+            open={isMobile ? sidebarOpen : desktopSidebarMode === 'permanent' ? true : sidebarOpen}
+            onClose={() => setSidebarOpen(false)}
+          />
+          <Container maxWidth="md" sx={{ py: { xs: 2, sm: 3, md: 4 } }}>
+            <div className="AppContent">
+              <MenuBar editor={editor} />
+              <EditorContent
+                editor={editor}
+                className="EditorContent"
+                tabIndex={0}
+                aria-label="Blog post editor area"
+                role="region"
+                style={{ outline: 'none' }}
+              />
+            </div>
+          </Container>
+        </div>
+        <footer className="AppFooter" style={{ background: muiTheme.palette.background.default, borderTop: '1px solid ' + muiTheme.palette.divider }}>
+          <Container maxWidth="md" sx={{ py: 2, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: 'center', justifyContent: 'space-between', gap: 2 }}>
+            <Typography variant="body2" color="text.secondary" align="center">
+              © {new Date().getFullYear()} Bloggy. All rights reserved.
+            </Typography>
+            <nav aria-label="Footer navigation">
+              <Button href="#about" color="primary" size="small" sx={{ textTransform: 'none', mx: 0.5 }}>About</Button>
+              <Button href="#privacy" color="primary" size="small" sx={{ textTransform: 'none', mx: 0.5 }}>Privacy</Button>
+              <Button href="#contact" color="primary" size="small" sx={{ textTransform: 'none', mx: 0.5 }}>Contact</Button>
+            </nav>
+          </Container>
+        </footer>
       </div>
-      <div style={{ marginBottom: 16, display: 'flex', gap: 8, alignItems: 'center' }}>
-        <input
-          type="text"
-          placeholder="Import from URL (http(s)://...)"
-          value={importUrl}
-          onChange={e => setImportUrl(e.target.value)}
-          style={{ width: 320 }}
-        />
-        <button onClick={importFromUrl} disabled={importing || !importUrl}>
-          {importing ? 'Importing...' : 'Import from URL'}
-        </button>
-      </div>
-      <EditorContent editor={editor} />
-    </div>
+    </ThemeProvider>
   );
 }
 

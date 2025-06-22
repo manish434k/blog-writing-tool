@@ -1,70 +1,53 @@
-# Blog Writing Tool
+# Bloggy – Modern Blog Writing Tool
 
-This project is a web-based blog writing tool with a React (Vite, TypeScript) frontend and a Node.js (Express, TypeScript) backend. It is designed for:
-- Medium-compatible writing pad (TipTap editor)
-- Import/export of posts and files (.txt, .docx, .pdf, etc.)
-- Social media and blogging platform integrations (OAuth)
-- Undo/redo (history) support
+## Overview
+Bloggy is a modern, web-based blog writing tool designed for clarity, accessibility, and a delightful writing experience. It features a rich text editor, file import/export, and a professional, branded UI based on the brand guide below.
 
-## Structure
-- `/client` - Frontend (React, Vite, TypeScript)
-- `/server` - Backend (Node.js, Express, TypeScript)
+## Tech Stack
+**Frontend:**
+- React (with Vite)
+- TypeScript
+- TipTap (rich text editor)
+- Material UI (MUI) for UI components and theming
+- @mui/icons-material for iconography
+- Axios for HTTP requests
 
-## Getting Started
+**Backend:**
+- Node.js
+- Express
+- TypeScript
+- REST APIs for post management and file import/export
+- `mammoth` for .docx import
+- `pdfjs-dist` for .pdf import
+- `docx` for .docx export
+- `puppeteer` for .pdf export
 
-### Frontend
-```sh
-npm install
-npm run dev
-```
+**Other:**
+- In-memory post storage (can be replaced with a database)
+- CORS proxy for URL imports
+- Modular, accessible, and responsive design
 
-### Backend
-```sh
-cd server
-npm install
-npx ts-node-dev src/index.ts
-```
+## Features
+- **Rich Text Editing:** Medium-like experience powered by TipTap and Material UI (MUI)
+- **Formatting Toolbar:** Bold, italic, headings, lists, undo/redo, and more
+- **Sidebar:** Save/load posts, import/export (.txt, .docx, .pdf, .html), import from URL
+- **Notifications:** Branded, accessible, and with icon support
+- **Responsive Layout:** Drawer sidebar, AppBar, and footer adapt to all devices
+- **Accessibility:** ARIA labels, keyboard navigation, and focus management
+- **Branding:** Custom theme, colors, fonts, favicon, and page title
 
----
+## Development & Structure
+- `/client`: Frontend React app (see `src/` for main code)
+- `/server`: Backend Express API (not shown here)
+- `BRAND_GUIDE.md`: Brand colors, fonts, and UI guidelines
+- `src/theme.ts`, `src/muiTheme.ts`: MUI theme setup
+- `src/App.tsx`: Main app, layout, and logic
+- `src/components/`: Modular UI components (MenuBar, SideBar, SnackbarQueue)
 
-## Features (Planned)
-- Medium-like writing experience
-- Import from URL, .txt, .docx, .pdf
-- Export/download/print
-- Social/blogging platform connect & publish
-- Undo/redo (history)
+## How to Run
+1. Install dependencies: `npm install`
+2. Start the frontend: `npm run dev`
+3. Start the backend (see `/server` for details)
 
----
 
-# Development Progress (as of June 22, 2025)
-
-## Project Setup
-- Monorepo with React (Vite, TypeScript) frontend and Node.js (Express, TypeScript) backend.
-- Version control initialized and project structure established.
-
-## Frontend
-- TipTap rich text editor integrated as the main writing pad.
-- Custom toolbar for formatting (bold, italic, headings, lists, undo/redo).
-- Save/Load post functionality connected to backend API.
-- File import: Supports .txt (client-side), .docx, .pdf (via backend).
-- File export: Supports .txt, .html (client-side), .docx, .pdf (via backend).
-- UI improved for file actions and toolbar.
-
-## Backend
-- Express server with TypeScript, using in-memory storage for posts.
-- REST API endpoints for saving/loading posts.
-- File import endpoints for .docx (mammoth) and .pdf (now using pdfjs-dist instead of pdf-parse).
-- File export endpoints for .docx (now using docx instead of html-docx-js) and .pdf (puppeteer).
-- Continuous logging of all API activity.
-- Removed custom type declarations for pdf-parse and html-docx-js; switched to maintained libraries with built-in types.
-
-## Recent Changes
-- Removed dependency on `pdf-parse` and `html-docx-js` due to install/type issues.
-- Switched PDF import to `pdfjs-dist` and DOCX export to `docx`.
-- Updated backend endpoints and documentation accordingly.
-
----
-
-See `.github/copilot-instructions.md` for workspace-specific Copilot instructions.
-
-_Last updated: June 22, 2025_
+For full brand details, see `BRAND_GUIDE.md`.
