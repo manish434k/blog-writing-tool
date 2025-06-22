@@ -3,6 +3,10 @@
 
 export const colors = {
   primaryGreen: '#4CAF50',
+  primaryBottleGreen: '#186049', // Bottle Green
+  primaryTeal: '#14b8a6', // Teal 500
+  primaryBlue: '#2563eb', // Modern Blue 600
+  primaryPurple: '#7c3aed', // Deep Purple 500
   primaryDarkGray: '#333333',
   secondaryLightGray: '#F5F5F5',
   secondaryBlue: '#2196F3',

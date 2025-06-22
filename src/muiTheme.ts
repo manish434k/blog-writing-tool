@@ -4,7 +4,7 @@ import { colors, fonts, fontWeights } from './theme';
 const muiTheme = createTheme({
   palette: {
     primary: {
-      main: colors.primaryGreen,
+      main: colors.primaryBottleGreen, // switched to Bottle Green
       contrastText: '#fff',
     },
     secondary: {
