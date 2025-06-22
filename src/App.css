@@ -50,6 +50,7 @@ body {
   gap: 8px;
   margin-bottom: 8px;
   align-items: center;
+  justify-content: center;
 }
 
 .EditorContent {

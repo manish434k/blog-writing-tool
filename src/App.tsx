@@ -219,8 +219,8 @@ function App() {
           />
         </Box>
         <div className="AppMain">
-          <Container maxWidth="md" sx={{ py: { xs: 2, sm: 3, md: 4 } }}>
-            <div className="AppContent">
+          <Container maxWidth="xl" sx={{ py: { xs: 2, sm: 3, md: 4 } }}>
+            <div className="AppContent" style={{ display: 'flex', justifyContent: 'center' }}>
               <MenuBar editor={editor} />
               <EditorContent
                 editor={editor}
@@ -228,7 +228,7 @@ function App() {
                 tabIndex={0}
                 aria-label="Blog post editor area"
                 role="region"
-                style={{ outline: 'none' }}
+                style={{ outline: 'none', width: '90vw', minWidth: 320, maxWidth: 1400, margin: '0 auto' }}
               />
             </div>
           </Container>
